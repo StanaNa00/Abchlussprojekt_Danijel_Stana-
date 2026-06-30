@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
-
+import os
+import numpy as np
 
 def plot_current_profile(current_profile: list[float], duration_profile: list[float]):
     """Plots the current over time profile starting from t=0s. The current is assumed to be piecewise constant over the given duration intervals.
@@ -161,4 +162,70 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     fig.legend(loc="upper right", bbox_to_anchor=(0.85, 0.85))
     fig.show()
 
+    return fig
+
+def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptordner):
+    """
+    Generiert ein Diagramm mit drei Subplots bezogen auf die zurückgelegte Distanz (km)
+    und zeigt zusätzlich die verstrichene Zeit auf einer oberen Achse an.
+    """
+
+    
+    distanz_km = berechnete_daten['delta_s'].cumsum() / 1000.0
+    
+    zeit_s = (berechnete_daten['time'] - berechnete_daten['time'].iloc[0]).dt.total_seconds()
+    zeit_min = zeit_s / 60.0
+    
+    fig, axs = plt.subplots(3, 1, figsize=(10, 11), sharex=True)
+    
+    # graph 1 hohe
+    axs[0].plot(distanz_km, berechnete_daten['ele'], color='green', linewidth=2, label='Höhenprofil (m)')
+    axs[0].set_ylabel('Höhe (m)')
+    axs[0].grid(True, linestyle='--', alpha=0.7)
+    axs[0].legend(loc='upper right')
+    axs[0].set_title('E-Bike Simulationsergebnisse: LiPo vs. NMC Akkupack', fontsize=12, fontweight='bold')
+    
+    # graph 2 SoC
+    axs[1].plot(distanz_km, daten_lipo['akku_soc'] * 100, label='LiPo SoC (%)', color='blue', linewidth=2)
+    axs[1].plot(distanz_km, daten_nmc['akku_soc'] * 100, label='NMC SoC (%)', color='orange', linewidth=2)
+    axs[1].set_ylabel('State of Charge (%)')
+    axs[1].set_ylim(-5, 105)
+    axs[1].grid(True, linestyle='--', alpha=0.7)
+    axs[1].legend(loc='lower left')
+    
+    # graph 3
+    axs[2].plot(distanz_km, daten_lipo['akku_spannung'], label='LiPo Spannung (V)', color='blue', linewidth=1.5)
+    axs[2].plot(distanz_km, daten_nmc['akku_spannung'], label='NMC Spannung (V)', color='orange', linewidth=1.5)
+    axs[2].set_xlabel('Distanz / km')
+    axs[2].set_ylabel('Spannung ($U$) / V')
+    axs[2].grid(True, linestyle='--', alpha=0.7)
+    axs[2].legend(loc='lower left')
+    
+
+    ax_time = axs[0].twiny()
+    
+
+    max_km = distanz_km.max()
+    km_ticks = np.arange(0, max_km + 1, max(1.0, round(max_km / 6)))
+    
+
+    time_labels = []
+    for km in km_ticks:
+
+        idx = (distanz_km - km).abs().idxmin()
+        t_min = zeit_min.loc[idx]
+        if t_min >= 60:
+            time_labels.append(f"{int(t_min // 60)}h {int(t_min % 60):02d}m")
+        else:
+            time_labels.append(f"{int(t_min)} min")
+            
+
+    ax_time.set_xlim(axs[0].get_xlim())
+    ax_time.set_xticks(km_ticks)
+    ax_time.set_xticklabels(time_labels, fontsize=9, alpha=0.8)
+    ax_time.set_xlabel('Verstrichene Zeit (Fahrtdauer)', fontsize=10, labelpad=10)
+    
+    plt.tight_layout()
+
+    plt.show(block=True)
     return fig

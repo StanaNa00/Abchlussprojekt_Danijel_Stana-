@@ -9,36 +9,36 @@ if hauptordner not in sys.path:
 from battery_models import LiPoAkku, NMCAkku
 from data_parser import GPSDataParser
 from physics_engine import EBikePhysics
+from plotting_utils import plot_simulations_ergebnisse
+
 
 def simuliere_akku_fahrt(datenframe, akku_objekt):
-    """
-    Simuliert die E-Bike-Fahrt Sekunde für Sekunde.
-    Nutzt den berechneten Motorstrom (I_motor), um den SoC und die Spannung zu aktualisieren.
-    """
+    df_sim = datenframe.copy(deep=True)
+
     soc_liste = []
     spannung_liste = []
-    warnung_ausgegeben = False
+    strom_liste = []
     
-    for index, zeile in datenframe.iterrows():
-        strom = zeile['I_motor']
+    for index, zeile in df_sim.iterrows():
+        if akku_objekt.is_empty():
+            strom = 0.0
+        else:
+            strom = zeile['I_motor']
+            
         dauer = zeile['delta_t']
         
-        # Strom auf das Akku-Objekt anwenden
         akku_objekt.apply_current(current=strom, duration=dauer)
         
-        # Aktuellen Zustand speichern
         soc_liste.append(akku_objekt.soc)
         spannung_liste.append(akku_objekt.voltage(current=strom))
+        strom_liste.append(strom)
         
-        # Warnung falls der Akku leer ist
-        if akku_objekt.is_empty() and not warnung_ausgegeben:
-            print(f"WARNUNG: Akku komplett entladen bei Zeitstempel {zeile['time']}!")
-            warnung_ausgegeben = True
-            
-    # Ergebnisse in den DataFrame schreiben
-    datenframe['akku_soc'] = soc_liste
-    datenframe['akku_spannung'] = spannung_liste
-    return datenframe
+    df_sim['akku_soc'] = soc_liste
+    df_sim['akku_spannung'] = spannung_liste
+    # echten strom speichern
+    df_sim['I_motor'] = strom_liste
+    
+    return df_sim
 
 def main():
     # Eingabedatei wählen 
@@ -57,33 +57,38 @@ def main():
     print("\nErste 10 Zeilen der berechneten Daten:")
     print(berechnete_daten[['time', 'v', 'a', 'F_ges', 'I_motor']].head(10))
 
-    print("\nStarte E-Bike-Batteriesimulation mit LiPo-Akku (10Ah, 100% Start-SoC)...")
-    lipo_batterie = LiPoAkku(capacity_nom_Ah=10.0, initial_soc=1.0)
-    
-    # Simulation ausführen
-    simulations_daten = simuliere_akku_fahrt(berechnete_daten, lipo_batterie)
-    
-    print("\n--------------------------------------------------")
-    print("Simulation beendet. Endzustand des Akkus:")
-    print(lipo_batterie)
-    print("--------------------------------------------------")
-    
-    # Anzeigen der neuen Akku-Werte in den ersten 10 Zeilen
-    print("\nErste 10 Zeilen der Simulationsdaten mit Akku-Werten:")
-    anzeige_spalten = ['time', 'v', 'I_motor', 'akku_soc', 'akku_spannung']
-    print(simulations_daten[anzeige_spalten].head(10))
 
-    # Bericht
-    gesamt_km = simulations_daten["delta_s"].sum() / 1000
-    motor_km = simulations_daten.loc[simulations_daten["I_motor"] > 0, "delta_s"].sum() / 1000
+    kapacitet_test = 30.0
+
+    print("\nStarte E-Bike-Batteriesimulation mit LiPo-Akku ({kapacitet_test}Ah, 100% Start-SoC)...")
+    lipo_batterie = LiPoAkku(capacity_nom_Ah=kapacitet_test, initial_soc=1.0)
+    daten_lipo = simuliere_akku_fahrt(berechnete_daten, lipo_batterie)
+    
+    print("\nStarte E-Bike-Batteriesimulation mit NMC-Akku ({kapacitet_test}Ah, 100% Start-SoC)...")
+    nmc_batterie = NMCAkku(capacity_nom_Ah=kapacitet_test, initial_soc=1.0)
+    daten_nmc = simuliere_akku_fahrt(berechnete_daten, nmc_batterie)
+
+
+
+# Bericht
+    gesamt_strecke_km = berechnete_daten['delta_s'].sum() / 1000.0
+    # Strecke, bei der der Motor Strom gezogen hat (I_motor > 0)
+    strecke_motor_lipo = daten_lipo[daten_lipo['I_motor'] > 0]['delta_s'].sum() / 1000.0
+    strecke_motor_nmc = daten_nmc[daten_nmc['I_motor'] > 0]['delta_s'].sum() / 1000.0
 
     print("\n----- Bericht -----")
-    print(f"Gesamt gefahrene Strecke: {gesamt_km:.2f} km")
-    print(f"Strecke mit Motorunterstützung: {motor_km:.2f} km")
-    print("Verwendete Batterie: LiPo (10 Ah)")
-    print(f"Restlicher Ladezustand: {lipo_batterie.soc * 100:.1f} %")
-    print(f"Restspannung: {lipo_batterie.voltage():.2f} V")
+    print(f"Gesamt gefahrene Strecke: {gesamt_strecke_km:.2f} km")
+    print(f"Strecke mit Motorunterstuetzung (LiPo): {strecke_motor_lipo:.2f} km")
+    print(f"Strecke mit Motorunterstuetzung (NMC): {strecke_motor_nmc:.2f} km")
+    print(f"Verwendete Batterie: LiPo ({lipo_batterie.C_nom / 3600.0:.1f} Ah)")
+    print(f"Verwendete Batterie: NMC ({nmc_batterie.C_nom / 3600.0:.1f} Ah)")
+    print(f"Restlicher Ladezustand: LiPo {lipo_batterie.soc * 100:.1f} %")
+    print(f"Restlicher Ladezustand: NMC {nmc_batterie.soc * 100:.1f} %")
+    print(f"Restspannung: LiPo {daten_lipo['akku_spannung'].iloc[-1]:.2f} V")
+    print(f"Restspannung: NMC {daten_nmc['akku_spannung'].iloc[-1]:.2f} V")
 
+    print("\nGeneriere Simulationsgrafiken...")
+    plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptordner)
 
 if __name__ == "__main__":
     main()
