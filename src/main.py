@@ -75,12 +75,15 @@ def main():
 
     # Bericht
     gesamt_km = simulations_daten["delta_s"].sum() / 1000
-    motor_km = simulations_daten.loc[simulations_daten["I_motor"] > 0, "delta_s"].sum() / 1000
+    motor_km = simulations_daten.loc[
+    (simulations_daten["I_motor"] > 0) & (simulations_daten["akku_soc"] > 0),
+    "delta_s"
+    ].sum() / 1000
 
     print("\n----- Bericht -----")
     print(f"Gesamt gefahrene Strecke: {gesamt_km:.2f} km")
     print(f"Strecke mit Motorunterstützung: {motor_km:.2f} km")
-    print("Verwendete Batterie: LiPo (10 Ah)")
+    print(f"Verwendete Batterie: LiPo (10 Ah)")
     print(f"Restlicher Ladezustand: {lipo_batterie.soc * 100:.1f} %")
     print(f"Restspannung: {lipo_batterie.voltage():.2f} V")
 
