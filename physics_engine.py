@@ -11,7 +11,7 @@ class EBikePhysics:
         self.cw_A = 0.5625
         # Umrechnung von 27 Zoll Durchmesser in Radius (Meter)
         self.r_rad = (27.0 / 2.0) * 0.0254 
-        self.k_m = 1.5 
+        self.k_m = 1.5 # Motorconstante in Nm/A
         
         # Weitere physikalische Konstanten
         self.rho = 1.225  # Luftdichte in kg/m^3
