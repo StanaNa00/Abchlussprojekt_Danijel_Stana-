@@ -1,8 +1,7 @@
 import sys
 import os
 
-# Hauptordner-Pfad ermitteln, damit Importe und Dateipfade immer funktionieren,
-# auch wenn main.py im src-Ordner liegt.
+# Projektordner bestimmen
 hauptordner = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if hauptordner not in sys.path:
     sys.path.append(hauptordner)
@@ -11,8 +10,7 @@ from data_parser import GPSDataParser
 from physics_engine import EBikePhysics
 
 def main():
-    # Absoluter Pfad zur CSV-Datei 
-    # (Passe den Namen an, falls deine CSV-Datei ".csv" im Namen hat)
+    # Eingabedatei wählen 
     dateipfad = os.path.join(hauptordner, "final_project_input_data.csv")
     
     print("Lade GPS-Daten...")
@@ -23,7 +21,7 @@ def main():
     physik = EBikePhysics(gps_daten)
     berechnete_daten = physik.calculate_physics()
     
-    # Zeige die ersten paar Zeilen zur Kontrolle an
+    # Erste werte anzeigen 
     print("\nErste 10 Zeilen der berechneten Daten:")
     print(berechnete_daten[['time', 'v', 'a', 'F_ges', 'I_motor']].head(10))
 
