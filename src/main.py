@@ -9,6 +9,8 @@ if hauptordner not in sys.path:
 from battery_models import LiPoAkku, NMCAkku
 from data_parser import GPSDataParser
 from physics_engine import EBikePhysics
+from plotting_utils import plot_ergebnisse
+
 
 def simuliere_akku_fahrt(datenframe, akku_objekt):
     """
@@ -80,13 +82,28 @@ def main():
     "delta_s"
     ].sum() / 1000
 
+    durchschnitt_v = simulations_daten["v"].mean() * 3.6
+    max_leistung = simulations_daten["P_mech"].max()
+    fahrzeit = simulations_daten["delta_t"].sum()
+
+    höhen_diff = simulations_daten["ele"].diff()
+    anstieg = höhen_diff[höhen_diff > 0].sum()
+    abstieg = -höhen_diff[höhen_diff < 0].sum()
+
     print("\n----- Bericht -----")
     print(f"Gesamt gefahrene Strecke: {gesamt_km:.2f} km")
     print(f"Strecke mit Motorunterstützung: {motor_km:.2f} km")
     print(f"Verwendete Batterie: LiPo (10 Ah)")
     print(f"Restlicher Ladezustand: {lipo_batterie.soc * 100:.1f} %")
     print(f"Restspannung: {lipo_batterie.voltage():.2f} V")
+    print(f"Durchschnittsgeschwindigkeit: {durchschnitt_v:.2f} km/h")
+    print(f"Fahrzeit: {fahrzeit / 60:.1f} min")
+    print(f"Maximale Leistung: {max_leistung:.1f} W")
+    print(f"Gesamter Anstieg: {anstieg:.1f} m")
+    print(f"Gesamter Abstieg: {abstieg:.1f} m")
 
+
+    plot_ergebnisse(simulations_daten)
 
 if __name__ == "__main__":
     main()
