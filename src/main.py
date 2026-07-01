@@ -1,5 +1,6 @@
 import sys
 import os
+import logging
 
 # Projektordner bestimmen
 hauptordner = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -10,6 +11,11 @@ from battery_models import LiPoAkku, NMCAkku
 from data_parser import GPSDataParser
 from physics_engine import EBikePhysics
 from plotting_utils import plot_simulations_ergebnisse
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(levelname)s: %(message)s"
+)
+
 
 
 def simuliere_akku_fahrt(datenframe, akku_objekt):
@@ -44,27 +50,27 @@ def main():
     # Eingabedatei wählen 
     dateipfad = os.path.join(hauptordner, "data", "final_project_input_data.csv")
     
-    print("Lade GPS-Daten...")
+    logging.info("Lade GPS-Daten")
     parser = GPSDataParser(dateipfad)
     gps_daten = parser.load_data()
     
-    print("Berechne physikalische Größen...")
+    logging.info("Berechne physikalische Größen")
     physik = EBikePhysics(gps_daten)
     berechnete_daten = physik.calculate_physics()
     
 
     # Erste werte anzeigen 
-    print("\nErste 10 Zeilen der berechneten Daten:")
+    print(f"Erste 10 Zeilen der berechneten Daten:")
     print(berechnete_daten[['time', 'v', 'a', 'F_ges', 'I_motor']].head(10))
 
 
     kapacitet_test = 30.0
 
-    print("\nStarte E-Bike-Batteriesimulation mit LiPo-Akku ({kapacitet_test}Ah, 100% Start-SoC)...")
+    logging.info(f"Starte E-Bike-Batteriesimulation mit LiPo-Akku ({kapacitet_test}Ah, 100% Start-SoC)")
     lipo_batterie = LiPoAkku(capacity_nom_Ah=kapacitet_test, initial_soc=1.0)
     daten_lipo = simuliere_akku_fahrt(berechnete_daten, lipo_batterie)
     
-    print("\nStarte E-Bike-Batteriesimulation mit NMC-Akku ({kapacitet_test}Ah, 100% Start-SoC)...")
+    logging.info(f"Starte E-Bike-Batteriesimulation mit NMC-Akku ({kapacitet_test}Ah, 100% Start-SoC)")
     nmc_batterie = NMCAkku(capacity_nom_Ah=kapacitet_test, initial_soc=1.0)
     daten_nmc = simuliere_akku_fahrt(berechnete_daten, nmc_batterie)
 
@@ -75,11 +81,27 @@ def main():
     # Strecke, bei der der Motor Strom gezogen hat (I_motor > 0)
     strecke_motor_lipo = daten_lipo[daten_lipo['I_motor'] > 0]['delta_s'].sum() / 1000.0
     strecke_motor_nmc = daten_nmc[daten_nmc['I_motor'] > 0]['delta_s'].sum() / 1000.0
+    durchschnitt_v = berechnete_daten["v"].mean() * 3.6
+    fahrzeit = berechnete_daten["delta_t"].sum() / 60
+    max_leistung = berechnete_daten["P_mech"].max()
+    höhen_diff = berechnete_daten["ele"].diff()
+    anstieg = höhen_diff[höhen_diff > 0].sum()
+    abstieg = -höhen_diff[höhen_diff < 0].sum()
 
+    
+    
+    
+    
     print("\n----- Bericht -----")
     print(f"Gesamt gefahrene Strecke: {gesamt_strecke_km:.2f} km")
-    print(f"Strecke mit Motorunterstuetzung (LiPo): {strecke_motor_lipo:.2f} km")
-    print(f"Strecke mit Motorunterstuetzung (NMC): {strecke_motor_nmc:.2f} km")
+    print(f"Strecke mit Motorunterstützung (LiPo): {strecke_motor_lipo:.2f} km")
+    print(f"Strecke mit Motorunterstützung (NMC): {strecke_motor_nmc:.2f} km")
+    print(f"Durchschnittsgeschwindigkeit: {durchschnitt_v:.2f} km/h")
+    print(f"Fahrzeit: {fahrzeit:.1f} min")
+    print(f"Maximale Leistung: {max_leistung:.1f} W")
+    print(f"Gesamter Anstieg: {anstieg:.1f} m")
+    print(f"Gesamter Abstieg: {abstieg:.1f} m")
+    print()
     print(f"Verwendete Batterie: LiPo ({lipo_batterie.C_nom / 3600.0:.1f} Ah)")
     print(f"Verwendete Batterie: NMC ({nmc_batterie.C_nom / 3600.0:.1f} Ah)")
     print(f"Restlicher Ladezustand: LiPo {lipo_batterie.soc * 100:.1f} %")
@@ -87,7 +109,7 @@ def main():
     print(f"Restspannung: LiPo {daten_lipo['akku_spannung'].iloc[-1]:.2f} V")
     print(f"Restspannung: NMC {daten_nmc['akku_spannung'].iloc[-1]:.2f} V")
 
-    print("\nGeneriere Simulationsgrafiken...")
+    logging.info(f"Generiere Simulationsgrafiken")
     plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptordner)
 
 if __name__ == "__main__":
