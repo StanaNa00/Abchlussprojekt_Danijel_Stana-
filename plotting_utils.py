@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
+import folium 
 
 def plot_current_profile(current_profile: list[float], duration_profile: list[float]):
     """Plots the current over time profile starting from t=0s. The current is assumed to be piecewise constant over the given duration intervals.
@@ -253,3 +254,100 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     # warte bis alle fenster geschlossen werden
     plt.show(block=True)
     return [fig1, fig2, fig3, fig4, fig5]
+
+
+
+
+
+def create_route_map(df):
+
+    m = folium.Map(
+        location=[df["lat"].mean(), df["lon"].mean()],
+        zoom_start=12
+    )
+
+    def speed_color(v):
+        v = v * 3.6   # m/s -> km/h
+
+        if v < 10:
+            return "blue"
+        elif v < 20:
+            return "cyan"
+        elif v < 30:
+            return "green"
+        elif v < 40:
+            return "yellow"
+        elif v < 50:
+            return "orange"
+        else:
+            return "red"
+
+    for i in range(len(df)-1):
+
+        p1 = [df.iloc[i]["lat"], df.iloc[i]["lon"]]
+        p2 = [df.iloc[i+1]["lat"], df.iloc[i+1]["lon"]]
+
+        folium.PolyLine(
+            [p1, p2],
+            color=speed_color(df.iloc[i]["v"]),
+            weight=6,
+            opacity=0.9
+        ).add_to(m)
+
+    folium.Marker(
+        [df.iloc[0]["lat"], df.iloc[0]["lon"]],
+        popup="Start",
+        icon=folium.Icon(color="green")
+    ).add_to(m)
+
+    folium.Marker(
+        [df.iloc[-1]["lat"], df.iloc[-1]["lon"]],
+        popup="Ende",
+        icon=folium.Icon(color="red")
+    ).add_to(m)
+
+    folium.Marker(
+        [df.iloc[-1]["lat"], df.iloc[-1]["lon"]],
+        popup="Ende",
+        icon=folium.Icon(color="red")
+    ).add_to(m)
+
+    legend_html = """
+    <div style="
+    position: fixed;
+    bottom: 40px;
+    left: 40px;
+    width: 170px;
+    background-color: white;
+    border:2px solid grey;
+    z-index:9999;
+    font-size:14px;
+    padding:10px;
+    ">
+    <b>Geschwindigkeit</b><br><br>
+    <span style="color:blue;">■</span> 0 - 10 km/h<br>
+    <span style="color:cyan;">■</span> 10 - 20 km/h<br>
+    <span style="color:green;">■</span> 20 - 30 km/h<br>
+    <span style="color:yellow;">■</span> 30 - 40 km/h<br>
+    <span style="color:orange;">■</span> 40 - 50 km/h<br>
+    <span style="color:red;">■</span> über 50 km/h
+    </div>
+    """
+
+    m.get_root().html.add_child(folium.Element(legend_html))
+
+    m.save("route_map.html")
+
+    print("Karte gespeichert als route_map.html")
+
+
+
+    m.save("route_map.html")
+
+    print("Karte gespeichert als route_map.html")
+
+
+
+
+    
+

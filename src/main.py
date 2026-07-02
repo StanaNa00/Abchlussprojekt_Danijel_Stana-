@@ -7,6 +7,7 @@ hauptordner = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 if hauptordner not in sys.path:
     sys.path.append(hauptordner)
 
+
 from battery_models import LiPoAkku, NMCAkku
 from data_parser import GPSDataParser
 from physics_engine import EBikePhysics
@@ -16,7 +17,7 @@ logging.basicConfig(
     format="%(levelname)s: %(message)s"
 )
 
-
+from plotting_utils import create_route_map
 
 def simuliere_akku_fahrt(datenframe, akku_objekt):
     df_sim = datenframe.copy(deep=True)
@@ -124,6 +125,9 @@ def main():
 
     logging.info(f"Generiere Simulationsgrafiken")
     plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptordner)
+
+    create_route_map(berechnete_daten)
+
 
 if __name__ == "__main__":
     main()
