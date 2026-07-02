@@ -168,6 +168,12 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     return fig
 
 def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptordner):
+    """
+    Generiert ein Diagramm mit drei Subplots bezogen auf die zurückgelegte Distanz (km)
+    und zeigt zusätzlich die verstrichene Zeit auf einer oberen Achse an.
+    """
+
+    
     distanz_km = berechnete_daten['delta_s'].cumsum() / 1000.0
     
     zeit_s = (berechnete_daten['time'] - berechnete_daten['time'].iloc[0]).dt.total_seconds()
@@ -193,16 +199,16 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
         ax_time.set_xticklabels(time_labels, fontsize=9, alpha=0.8)
         ax_time.set_xlabel('zeit', fontsize=10, labelpad=10)
 
-    # 1. hoehe
+    # 1. höhe
     fig1, ax1 = plt.subplots(figsize=(10, 4))
-    ax1.plot(distanz_km, berechnete_daten['ele'], color='green', linewidth=2, label='hoehe (m)')
-    ax1.set_ylabel('hoehe (m)')
+    ax1.plot(distanz_km, berechnete_daten['ele'], color='green', linewidth=2, label='höhe (m)')
+    ax1.set_ylabel('höhe (m)')
     ax1.set_xlabel('distanz (km)')
     ax1.grid(True, linestyle='--', alpha=0.7)
     ax1.legend()
     add_time_axis(ax1)
     fig1.tight_layout()
-    fig1.savefig(os.path.join(hauptordner, '1_hoehenprofil.png'), dpi=300)
+    fig1.savefig(os.path.join(hauptordner, '1_höhenprofil.png'), dpi=300)
 
     # 2. geschwindigkeit
     fig2, ax2 = plt.subplots(figsize=(10, 4))
@@ -251,7 +257,7 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     fig5.tight_layout()
     fig5.savefig(os.path.join(hauptordner, '5_spannung.png'), dpi=300)
 
-    # warte bis alle fenster geschlossen werden
+
     plt.show(block=True)
     return [fig1, fig2, fig3, fig4, fig5]
 
@@ -341,10 +347,6 @@ def create_route_map(df):
     print("Karte gespeichert als route_map.html")
 
 
-
-    m.save("route_map.html")
-
-    print("Karte gespeichert als route_map.html")
 
 
 
