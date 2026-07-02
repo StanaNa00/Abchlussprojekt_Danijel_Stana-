@@ -81,7 +81,7 @@ git clone <Repository-URL>
 Projektordner öffnen
 
 ```bash
-cd Abschlussprojekt_Danijel_Stana
+cd Abschlussprojekt_Danijel_Stana-
 ```
 
 Benötigte Pakete installieren
@@ -105,6 +105,7 @@ python src/main.py
 - pandas
 - numpy
 - matplotlib
+- ffolium
 
 Weitere benötigte Pakete befinden sich in der Datei `requirements.txt`.
 
