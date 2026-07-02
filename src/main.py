@@ -57,7 +57,14 @@ def main():
     logging.info("Berechne physikalische Größen")
     physik = EBikePhysics(gps_daten)
     berechnete_daten = physik.calculate_physics()
+
+    # steigung
+    hoehen_diff = berechnete_daten['ele'].diff().fillna(0)
+    berechnete_daten['steigung'] = (hoehen_diff / berechnete_daten['delta_s'].replace(0, 1)) * 100
     
+    # drehmoment
+    motorkonstante_nm_pro_a = 1.5 
+    berechnete_daten['drehmoment'] = berechnete_daten['I_motor'] * motorkonstante_nm_pro_a
 
     # Erste werte anzeigen 
     print(f"Erste 10 Zeilen der berechneten Daten:")
@@ -76,6 +83,8 @@ def main():
 
 
 
+
+
 # Bericht
     gesamt_strecke_km = berechnete_daten['delta_s'].sum() / 1000.0
     # Strecke, bei der der Motor Strom gezogen hat (I_motor > 0)
@@ -87,6 +96,8 @@ def main():
     höhen_diff = berechnete_daten["ele"].diff()
     anstieg = höhen_diff[höhen_diff > 0].sum()
     abstieg = -höhen_diff[höhen_diff < 0].sum()
+    max_steigung = berechnete_daten["steigung"].max()
+    max_drehmoment = berechnete_daten["drehmoment"].max()
 
     
     
@@ -99,6 +110,8 @@ def main():
     print(f"Durchschnittsgeschwindigkeit: {durchschnitt_v:.2f} km/h")
     print(f"Fahrzeit: {fahrzeit:.1f} min")
     print(f"Maximale Leistung: {max_leistung:.1f} W")
+    print(f"Maximale Steigung: {max_steigung:.1f} %")
+    print(f"Maximales Drehmoment: {max_drehmoment:.1f} Nm")
     print(f"Gesamter Anstieg: {anstieg:.1f} m")
     print(f"Gesamter Abstieg: {abstieg:.1f} m")
     print()

@@ -75,21 +75,23 @@ def plot_power_profile(power_profile: list[float], duration_profile: list[float]
 
 
 def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[float]):
-    """Plots the voltage over time profile starting from t=0s. 
-    The voltage_profile must start with the initial voltage at t=0s, and the subsequent voltage values correspond to the voltage after applying the current for the respective duration intervals.
-    The voltage is assumed to be piecewise constant over the given duration intervals.
+    """Plottet die Spannungs- und Stromprofile über der Zeit beginnend bei t=0s.
+    Das voltage_profile muss mit der Anfangsspannung bei t=0s beginnen, und die nachfolgenden Spannungswerte entsprechen der Spannung, nachdem der Strom für das jeweilige Zeitintervall angelegt wurde.
+    Es wird angenommen, dass Spannung und Strom über die gegebenen Zeitintervalle stückweise konstant sind.
 
     Parameters
     ----------
     voltage_profile : list[float]
-        List of voltage values in Volts (V) for each interval. Plus the initial voltage at t=0s.
+        Liste von Spannungswerten in Volt (V) für jedes Intervall, plus die Anfangsspannung bei t=0s.
+    current_profile : list[float]
+        Liste von Stromwerten in Ampere (A) für jedes Intervall.
     duration_profile : list[float]
-        List of duration values in seconds (s) for each interval. Must have the same length as voltage_profile.
+        Liste von Dauerwerten in Sekunden (s) für jedes Intervall. Muss die gleiche Länge wie voltage_profile und current_profile haben.
 
     Returns
     -------
     fig : matplotlib.figure.Figure
-        The matplotlib figure object containing the plot of voltage over time.
+        Das Matplotlib-Figure-Objekt, das den Plot von Spannung und Strom über der Zeit enthält.
     """
 
     assert len(voltage_profile) - 1 == len(duration_profile), "Voltage profile must be longer by 1 than duration profile and to account for the starting voltage at t=0s."
@@ -115,27 +117,27 @@ def plot_voltage_profile(voltage_profile: list[float], duration_profile: list[fl
     return fig
 
 def plot_voltage_and_current_profile(voltage_profile: list[float], current_profile: list[float], duration_profile: list[float]):
-    """Plots the voltage and current over time profiles starting from t=0s. 
-    The voltage_profile must start with the initial voltage at t=0s, and the subsequent voltage values correspond to the voltage after applying the current for the respective duration intervals.
-    The voltage and current are assumed to be piecewise constant over the given duration intervals.
+    """Plottet die Spannungs- und Stromprofile über der Zeit beginnend bei t=0s.
+    Das voltage_profile muss mit der Anfangsspannung bei t=0s beginnen, und die nachfolgenden Spannungswerte entsprechen der Spannung, nachdem der Strom für das jeweilige Zeitintervall angelegt wurde.
+    Es wird angenommen, dass Spannung und Strom über die gegebenen Zeitintervalle stückweise konstant sind.
 
     Parameters
     ----------
     voltage_profile : list[float]
-        List of voltage values in Volts (V) for each interval. Plus the initial voltage at t=0s.
+        Liste von Spannungswerten in Volt (V) für jedes Intervall, plus die Anfangsspannung bei t=0s.
     current_profile : list[float]
-        List of current values in Amperes (A) for each interval.
+        Liste von Stromwerten in Ampere (A) für jedes Intervall.
     duration_profile : list[float]
-        List of duration values in seconds (s) for each interval. Must have the same length as voltage_profile and current_profile.
+        Liste von Dauerwerten in Sekunden (s) für jedes Intervall. Muss die gleiche Länge wie voltage_profile und current_profile haben.
 
     Returns
     -------
     fig : matplotlib.figure.Figure
-        The matplotlib figure object containing the plot of voltage and current over time.
+        Das Matplotlib-Figure-Objekt, das den Plot von Spannung und Strom über der Zeit enthält.
     """
 
-    assert len(voltage_profile) - 1 == len(current_profile) == len(duration_profile), "Current and duration profiles must have the same length, and voltage profile must be longer by 1 to account for the starting voltage at t=0s."
-
+    assert len(voltage_profile) - 1 == len(current_profile) == len(duration_profile), "Voltage profile must be longer by 1 than current and duration profiles to account for the starting voltage at t=0s."
+   
     t_plot, U_plot, I_plot = [], [], []
 
     t_plot.append(0.0)
@@ -165,67 +167,89 @@ def plot_voltage_and_current_profile(voltage_profile: list[float], current_profi
     return fig
 
 def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptordner):
-    """
-    Generiert ein Diagramm mit drei Subplots bezogen auf die zurückgelegte Distanz (km)
-    und zeigt zusätzlich die verstrichene Zeit auf einer oberen Achse an.
-    """
-
-    
     distanz_km = berechnete_daten['delta_s'].cumsum() / 1000.0
     
     zeit_s = (berechnete_daten['time'] - berechnete_daten['time'].iloc[0]).dt.total_seconds()
     zeit_min = zeit_s / 60.0
     
-    fig, axs = plt.subplots(3, 1, figsize=(10, 11), sharex=True)
-    
-    # graph 1 hohe
-    axs[0].plot(distanz_km, berechnete_daten['ele'], color='green', linewidth=2, label='Höhenprofil (m)')
-    axs[0].set_ylabel('Höhe (m)')
-    axs[0].grid(True, linestyle='--', alpha=0.7)
-    axs[0].legend(loc='upper right')
-    axs[0].set_title('E-Bike Simulationsergebnisse: LiPo vs. NMC Akkupack', fontsize=12, fontweight='bold')
-    
-    # graph 2 SoC
-    axs[1].plot(distanz_km, daten_lipo['akku_soc'] * 100, label='LiPo SoC (%)', color='blue', linewidth=2)
-    axs[1].plot(distanz_km, daten_nmc['akku_soc'] * 100, label='NMC SoC (%)', color='orange', linewidth=2)
-    axs[1].set_ylabel('State of Charge (%)')
-    axs[1].set_ylim(-5, 105)
-    axs[1].grid(True, linestyle='--', alpha=0.7)
-    axs[1].legend(loc='lower left')
-    
-    # graph 3
-    axs[2].plot(distanz_km, daten_lipo['akku_spannung'], label='LiPo Spannung (V)', color='blue', linewidth=1.5)
-    axs[2].plot(distanz_km, daten_nmc['akku_spannung'], label='NMC Spannung (V)', color='orange', linewidth=1.5)
-    axs[2].set_xlabel('Distanz / km')
-    axs[2].set_ylabel('Spannung ($U$) / V')
-    axs[2].grid(True, linestyle='--', alpha=0.7)
-    axs[2].legend(loc='lower left')
-    
+    def add_time_axis(ax):
+        # hilfsfunktion fuer zeitachse
+        ax_time = ax.twiny()
+        max_km = distanz_km.max()
+        km_ticks = np.arange(0, max_km + 1, max(1.0, round(max_km / 6)))
+        
+        time_labels = []
+        for km in km_ticks:
+            idx = (distanz_km - km).abs().idxmin()
+            t_min = zeit_min.loc[idx]
+            if t_min >= 60:
+                time_labels.append(f"{int(t_min // 60)}h {int(t_min % 60):02d}m")
+            else:
+                time_labels.append(f"{int(t_min)} min")
+        
+        ax_time.set_xlim(ax.get_xlim())
+        ax_time.set_xticks(km_ticks)
+        ax_time.set_xticklabels(time_labels, fontsize=9, alpha=0.8)
+        ax_time.set_xlabel('zeit', fontsize=10, labelpad=10)
 
-    ax_time = axs[0].twiny()
-    
+    # 1. hoehe
+    fig1, ax1 = plt.subplots(figsize=(10, 4))
+    ax1.plot(distanz_km, berechnete_daten['ele'], color='green', linewidth=2, label='hoehe (m)')
+    ax1.set_ylabel('hoehe (m)')
+    ax1.set_xlabel('distanz (km)')
+    ax1.grid(True, linestyle='--', alpha=0.7)
+    ax1.legend()
+    add_time_axis(ax1)
+    fig1.tight_layout()
+    fig1.savefig(os.path.join(hauptordner, '1_hoehenprofil.png'), dpi=300)
 
-    max_km = distanz_km.max()
-    km_ticks = np.arange(0, max_km + 1, max(1.0, round(max_km / 6)))
-    
+    # 2. geschwindigkeit
+    fig2, ax2 = plt.subplots(figsize=(10, 4))
+    ax2.plot(distanz_km, berechnete_daten['v'] * 3.6, color='purple', linewidth=2, label='geschw. (km/h)')
+    ax2.set_ylabel('geschw. (km/h)')
+    ax2.set_xlabel('distanz (km)')
+    ax2.grid(True, linestyle='--', alpha=0.7)
+    ax2.legend()
+    add_time_axis(ax2)
+    fig2.tight_layout()
+    fig2.savefig(os.path.join(hauptordner, '2_geschwindigkeit.png'), dpi=300)
 
-    time_labels = []
-    for km in km_ticks:
+    # 3. leistung
+    fig3, ax3 = plt.subplots(figsize=(10, 4))
+    ax3.plot(distanz_km, berechnete_daten['P_mech'], color='red', linewidth=2, label='leistung (W)')
+    ax3.set_ylabel('leistung (W)')
+    ax3.set_xlabel('distanz (km)')
+    ax3.grid(True, linestyle='--', alpha=0.7)
+    ax3.legend()
+    add_time_axis(ax3)
+    fig3.tight_layout()
+    fig3.savefig(os.path.join(hauptordner, '3_leistung.png'), dpi=300)
 
-        idx = (distanz_km - km).abs().idxmin()
-        t_min = zeit_min.loc[idx]
-        if t_min >= 60:
-            time_labels.append(f"{int(t_min // 60)}h {int(t_min % 60):02d}m")
-        else:
-            time_labels.append(f"{int(t_min)} min")
-            
+    # 4. soc
+    fig4, ax4 = plt.subplots(figsize=(10, 4))
+    ax4.plot(distanz_km, daten_lipo['akku_soc'] * 100, label='LiPo SoC (%)', color='blue', linewidth=2)
+    ax4.plot(distanz_km, daten_nmc['akku_soc'] * 100, label='NMC SoC (%)', color='orange', linewidth=2)
+    ax4.set_ylabel('SoC (%)')
+    ax4.set_xlabel('distanz (km)')
+    ax4.set_ylim(-5, 105)
+    ax4.grid(True, linestyle='--', alpha=0.7)
+    ax4.legend()
+    add_time_axis(ax4)
+    fig4.tight_layout()
+    fig4.savefig(os.path.join(hauptordner, '4_soc.png'), dpi=300)
 
-    ax_time.set_xlim(axs[0].get_xlim())
-    ax_time.set_xticks(km_ticks)
-    ax_time.set_xticklabels(time_labels, fontsize=9, alpha=0.8)
-    ax_time.set_xlabel('Verstrichene Zeit (Fahrtdauer)', fontsize=10, labelpad=10)
-    
-    plt.tight_layout()
+    # 5. spannung
+    fig5, ax5 = plt.subplots(figsize=(10, 4))
+    ax5.plot(distanz_km, daten_lipo['akku_spannung'], label='LiPo (V)', color='blue', linewidth=1.5)
+    ax5.plot(distanz_km, daten_nmc['akku_spannung'], label='NMC (V)', color='orange', linewidth=1.5)
+    ax5.set_ylabel('spannung (V)')
+    ax5.set_xlabel('distanz (km)')
+    ax5.grid(True, linestyle='--', alpha=0.7)
+    ax5.legend()
+    add_time_axis(ax5)
+    fig5.tight_layout()
+    fig5.savefig(os.path.join(hauptordner, '5_spannung.png'), dpi=300)
 
+    # warte bis alle fenster geschlossen werden
     plt.show(block=True)
-    return fig
+    return [fig1, fig2, fig3, fig4, fig5]
