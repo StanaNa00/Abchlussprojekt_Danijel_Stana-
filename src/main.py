@@ -1,6 +1,7 @@
 import sys
 import os
 import logging
+import math 
 
 # Projektordner bestimmen
 hauptordner = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -46,6 +47,33 @@ def simuliere_akku_fahrt(datenframe, akku_objekt):
     df_sim['I_motor'] = strom_liste
     
     return df_sim
+
+
+def berechne_himmelsrichtung(df):
+    lat1 = math.radians(df["lat"].iloc[0])
+    lon1 = math.radians(df["lon"].iloc[0])
+    lat2 = math.radians(df["lat"].iloc[-1])
+    lon2 = math.radians(df["lon"].iloc[-1])
+
+    delta_lon = lon2 - lon1
+
+    x = math.sin(delta_lon) * math.cos(lat2)
+    y = math.cos(lat1) * math.sin(lat2) - math.sin(lat1) * math.cos(lat2) * math.cos(delta_lon)
+
+    winkel = (math.degrees(math.atan2(x, y)) + 360) % 360
+
+    richtungen = [
+        "Nord", "Nordost", "Ost", "Südost",
+        "Süd", "Südwest", "West", "Nordwest"
+    ]
+
+    index = round(winkel / 45) % 8
+    return winkel, richtungen[index]
+
+
+
+
+
 
 def main():
     # Eingabedatei wählen 
@@ -99,6 +127,7 @@ def main():
     abstieg = -höhen_diff[höhen_diff < 0].sum()
     max_steigung = berechnete_daten["steigung"].max()
     max_drehmoment = berechnete_daten["drehmoment"].max()
+    winkel, richtung = berechne_himmelsrichtung(berechnete_daten)
 
     
     
@@ -115,6 +144,7 @@ def main():
     print(f"Maximales Drehmoment: {max_drehmoment:.1f} Nm")
     print(f"Gesamter Anstieg: {anstieg:.1f} m")
     print(f"Gesamter Abstieg: {abstieg:.1f} m")
+    print(f"Hauptrichtung der Fahrt: {richtung} ({winkel:.1f}°)")
     print()
     print(f"Verwendete Batterie: LiPo ({lipo_batterie.C_nom / 3600.0:.1f} Ah)")
     print(f"Verwendete Batterie: NMC ({nmc_batterie.C_nom / 3600.0:.1f} Ah)")
