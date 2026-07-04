@@ -55,6 +55,7 @@ Abschlussprojekt_Danijel_Stana/
 ├── src/
 │   └── main.py
 │
+├── plots.png
 ├── battery_base.py
 ├── battery_models.py
 ├── battery_pack.py
@@ -65,7 +66,8 @@ Abschlussprojekt_Danijel_Stana/
 ├── physics_engine.py
 ├── plotting_utils.py
 ├── requirements.txt
-└── README.md
+├── README.md
+└── route_map.html
 ```
 
 ---
@@ -75,7 +77,7 @@ Abschlussprojekt_Danijel_Stana/
 Repository klonen
 
 ```bash
-git clone <Repository-URL>
+git clone https://github.com/StanaNa00/Abchlussprojekt_Danijel_Stana-.git
 ```
 
 Projektordner öffnen
@@ -105,7 +107,8 @@ python src/main.py
 - pandas
 - numpy
 - matplotlib
-- ffolium
+- folium
+- openpyxl
 
 Weitere benötigte Pakete befinden sich in der Datei `requirements.txt`.
 
@@ -126,6 +129,50 @@ Zusätzlich zu den Minimalanforderungen wurden folgende Erweiterungen umgesetzt:
 - Berechnung des gesamten Anstiegs und Abstiegs
 - Zusammenfassender Bericht im Terminal
 - Logging der wichtigsten Programmschritte während der Simulation
+
+
+
+- python +
+- daten lesen +
+- geschwindigkeit +
+- beschleunigung +
+- leistung +
+- steigung +
+- drehmoment +
+- motor strom +
+- SoC +
+- durchcchnittsgeschwindigkeit +
+- zuruckgelegte strecke +
+- benotigte zeit +
+- hohenmeter +
+- maximalleistung +
+- 009 +
+- LiPo +
+- NMC +
+- plots:
+	  Geschwindigkeit +
+	  leistung +
+	  SoC +
+	  hohenprofil +
+- Logging +
+- Aktivitatsdiagram
+- requirements.txt +
+
+- exstras:
+
+- hilfreiche dinge +
+- gute GitHub Commits +
+- Ploten der strecke +
+- Unit-test -
+- auto parametriserung -
+- luftdichte -
+- rollwiderstand sim -
+- akkutemp sim -
+- bremswiderstand sim -
+- ort/adresse -
+- wetterdaten -
+- orientirung +
+- LaTeX -
 
 ---
 
