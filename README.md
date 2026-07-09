@@ -174,7 +174,7 @@ Zusätzlich zu den Minimalanforderungen wurden folgende Erweiterungen umgesetzt:
 	  SoC +
 	  hohenprofil +
 - Logging +
-- Aktivitatsdiagram
+- Aktivitatsdiagram +
 - requirements.txt +
 
 - exstras:
@@ -183,7 +183,7 @@ Zusätzlich zu den Minimalanforderungen wurden folgende Erweiterungen umgesetzt:
 - gute GitHub Commits +
 - Ploten der strecke +
 - Unit-test -
-- auto parametriserung -
+- auto parametriserung +
 - luftdichte -
 - rollwiderstand sim -
 - akkutemp sim -
