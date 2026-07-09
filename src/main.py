@@ -2,6 +2,7 @@ import sys
 import os
 import logging
 import math 
+import matplotlib.pyplot as plt
 
 # Projektordner bestimmen
 hauptordner = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -72,7 +73,84 @@ def berechne_himmelsrichtung(df):
 
 
 
+def parameterstudie_masse_reifen(gps_daten, hauptordner):
+    fahrer_massen = [60, 70, 80, 90, 100]
+    reifen_zoll = [26, 27, 27.5, 28, 29]
 
+    ergebnisse_masse = []
+
+    for masse in fahrer_massen:
+        physik = EBikePhysics(gps_daten.copy(deep=True), m_fahrer=masse, m_fahrrad=10.0, raddurchmesser_zoll=27.0)
+        daten = physik.calculate_physics()
+
+        akku = LiPoAkku(capacity_nom_Ah=30.0, initial_soc=1.0)
+        daten_akku = simuliere_akku_fahrt(daten, akku)
+
+        strecke_motor = daten_akku[daten_akku["I_motor"] > 0]["delta_s"].sum() / 1000.0
+        max_leistung = daten["P_mech"].max()
+
+        ergebnisse_masse.append((masse, strecke_motor, max_leistung))
+
+    ergebnisse_reifen = []
+
+    for zoll in reifen_zoll:
+        physik = EBikePhysics(gps_daten.copy(deep=True), m_fahrer=70.0, m_fahrrad=10.0, raddurchmesser_zoll=zoll)
+        daten = physik.calculate_physics()
+
+        akku = LiPoAkku(capacity_nom_Ah=30.0, initial_soc=1.0)
+        daten_akku = simuliere_akku_fahrt(daten, akku)
+
+        strecke_motor = daten_akku[daten_akku["I_motor"] > 0]["delta_s"].sum() / 1000.0
+
+        ergebnisse_reifen.append((zoll, strecke_motor))
+
+    output_ordner = os.path.join(hauptordner, "output")
+    os.makedirs(output_ordner, exist_ok=True)
+
+    txt_pfad = os.path.join(output_ordner, "parameterstudie.txt")
+
+    with open(txt_pfad, "w", encoding="utf-8") as datei:
+        datei.write("Parameterstudie\n")
+        datei.write("================\n\n")
+
+        datei.write("Einfluss der Fahrermasse:\n")
+        for masse, strecke, leistung in ergebnisse_masse:
+            datei.write(f"{masse} kg Fahrer: {strecke:.2f} km Motorunterstützung, max. Leistung {leistung:.1f} W\n")
+
+        datei.write("\nEinfluss des Reifendurchmessers:\n")
+        for zoll, strecke in ergebnisse_reifen:
+            datei.write(f"{zoll} Zoll Reifen: {strecke:.2f} km Motorunterstützung\n")
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(
+        [x[0] for x in ergebnisse_masse],
+        [x[1] for x in ergebnisse_masse],
+        marker="o"
+    )
+    plt.title("Parameterstudie: Einfluss der Fahrermasse")
+    plt.xlabel("Fahrermasse [kg]")
+    plt.ylabel("Motorunterstützte Strecke [km]")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_ordner, "7_parameterstudie_masse.png"))
+    plt.close()
+
+    plt.figure(figsize=(8, 5))
+    plt.plot(
+        [x[0] for x in ergebnisse_reifen],
+        [x[1] for x in ergebnisse_reifen],
+        marker="o"
+    )
+    plt.title("Parameterstudie: Einfluss des Reifendurchmessers")
+    plt.xlabel("Reifendurchmesser [Zoll]")
+    plt.ylabel("Motorunterstützte Strecke [km]")
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig(os.path.join(output_ordner, "8_parameterstudie_reifen.png"))
+    plt.close()
+
+
+    print("Parameterstudie gespeichert.")
 
 
 def main():
@@ -100,7 +178,7 @@ def main():
     print(berechnete_daten[['time', 'v', 'a', 'F_ges', 'I_motor']].head(10))
 
 
-    kapacitet_test = 30.0
+    kapacitet_test = 40.0
 
     logging.info(f"Starte E-Bike-Batteriesimulation mit LiPo-Akku ({kapacitet_test}Ah, 100% Start-SoC)")
     lipo_batterie = LiPoAkku(capacity_nom_Ah=kapacitet_test, initial_soc=1.0)
@@ -158,6 +236,7 @@ def main():
 
     create_route_map(berechnete_daten)
 
+    parameterstudie_masse_reifen(gps_daten, hauptordner)
 
 if __name__ == "__main__":
     main()

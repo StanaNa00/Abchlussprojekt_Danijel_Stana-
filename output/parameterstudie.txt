@@ -1,0 +1,16 @@
+Parameterstudie
+================
+
+Einfluss der Fahrermasse:
+60 kg Fahrer: 88.03 km Motorunterstützung, max. Leistung 8539.2 W
+70 kg Fahrer: 82.39 km Motorunterstützung, max. Leistung 9734.6 W
+80 kg Fahrer: 72.97 km Motorunterstützung, max. Leistung 10930.0 W
+90 kg Fahrer: 62.49 km Motorunterstützung, max. Leistung 12125.3 W
+100 kg Fahrer: 58.84 km Motorunterstützung, max. Leistung 13320.7 W
+
+Einfluss des Reifendurchmessers:
+26 Zoll Reifen: 86.26 km Motorunterstützung
+27 Zoll Reifen: 82.39 km Motorunterstützung
+27.5 Zoll Reifen: 81.39 km Motorunterstützung
+28 Zoll Reifen: 78.22 km Motorunterstützung
+29 Zoll Reifen: 74.90 km Motorunterstützung

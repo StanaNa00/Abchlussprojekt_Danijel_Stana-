@@ -2,15 +2,15 @@ import numpy as np
 import pandas as pd
 
 class EBikePhysics:
-    def __init__(self, df: pd.DataFrame):
+    def __init__(self, df: pd.DataFrame, m_fahrer=70.0, m_fahrrad=10.0, raddurchmesser_zoll=27.0):
         self.df = df
         # Konstanten aus der Projektangabe
-        self.m_fahrer = 70.0
-        self.m_fahrrad = 10.0
+        self.m_fahrer = m_fahrer
+        self.m_fahrrad = m_fahrrad
         self.m_ges = self.m_fahrer + self.m_fahrrad
         self.cw_A = 0.5625
         # Umrechnung von 27 Zoll Durchmesser in Radius (Meter)
-        self.r_rad = (27.0 / 2.0) * 0.0254 
+        self.r_rad = (raddurchmesser_zoll / 2.0) * 0.0254
         self.k_m = 1.5 # Motorconstante in Nm/A
         
         # Weitere physikalische Konstanten

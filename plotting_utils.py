@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-import folium 
+import folium
+
 
 def plot_current_profile(current_profile: list[float], duration_profile: list[float]):
     """Plots the current over time profile starting from t=0s. The current is assumed to be piecewise constant over the given duration intervals.
@@ -173,8 +174,12 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     und zeigt zusätzlich die verstrichene Zeit auf einer oberen Achse an.
     """
 
-    
+
     distanz_km = berechnete_daten['delta_s'].cumsum() / 1000.0
+
+    output_ordner = os.path.join(hauptordner, "output")
+    os.makedirs(output_ordner, exist_ok=True)
+
     
     zeit_s = (berechnete_daten['time'] - berechnete_daten['time'].iloc[0]).dt.total_seconds()
     zeit_min = zeit_s / 60.0
@@ -208,7 +213,7 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     ax1.legend()
     add_time_axis(ax1)
     fig1.tight_layout()
-    fig1.savefig(os.path.join(hauptordner, '1_höhenprofil.png'), dpi=300)
+    fig1.savefig(os.path.join(output_ordner, '1_höhenprofil.png'), dpi=300)
 
     # 2. geschwindigkeit
     fig2, ax2 = plt.subplots(figsize=(10, 4))
@@ -219,7 +224,7 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     ax2.legend()
     add_time_axis(ax2)
     fig2.tight_layout()
-    fig2.savefig(os.path.join(hauptordner, '2_geschwindigkeit.png'), dpi=300)
+    fig2.savefig(os.path.join(output_ordner, '2_geschwindigkeit.png'), dpi=300)
 
     # 3. leistung
     fig3, ax3 = plt.subplots(figsize=(10, 4))
@@ -230,7 +235,7 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     ax3.legend()
     add_time_axis(ax3)
     fig3.tight_layout()
-    fig3.savefig(os.path.join(hauptordner, '3_leistung.png'), dpi=300)
+    fig3.savefig(os.path.join(output_ordner, '3_leistung.png'), dpi=300)
 
     # 4. soc
     fig4, ax4 = plt.subplots(figsize=(10, 4))
@@ -243,7 +248,7 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     ax4.legend()
     add_time_axis(ax4)
     fig4.tight_layout()
-    fig4.savefig(os.path.join(hauptordner, '4_soc.png'), dpi=300)
+    fig4.savefig(os.path.join(output_ordner, '4_soc.png'), dpi=300)
 
     # 5. spannung
     fig5, ax5 = plt.subplots(figsize=(10, 4))
@@ -255,7 +260,7 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     ax5.legend()
     add_time_axis(ax5)
     fig5.tight_layout()
-    fig5.savefig(os.path.join(hauptordner, '5_spannung.png'), dpi=300)
+    fig5.savefig(os.path.join(output_ordner, '5_spannung.png'), dpi=300)
 
 
     plt.show(block=True)

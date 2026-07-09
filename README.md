@@ -1,5 +1,10 @@
 # Abschlussprojekt_Danijel_Stana
 
+## Autoren
+
+- Danijel PALADIN (DanijelRS)
+- Stana NARIC (StanaNa00)
+
 ## Programmieren 1 – Abschlussprojekt
 
 Dieses Projekt simuliert den Energieverbrauch eines E-Bikes anhand von GPS-Fahrdaten. Dabei werden die Fahrphysik berechnet, zwei unterschiedliche Akkumodelle simuliert und die Ergebnisse grafisch dargestellt.
@@ -12,19 +17,22 @@ Das Programm bietet folgende Funktionen:
 
 - Einlesen einer GPS-Datei (CSV)
 - Berechnung der Fahrphysik
-  - Geschwindigkeit
-  - Beschleunigung
-  - Steigung
-  - Motordrehmoment
-  - Motorstrom
-  - Mechanische Leistung
-- Simulation von zwei Akkutypen
-  - LiPo-Akku
-  - NMC-Akku
-- Berechnung des Ladezustands (State of Charge)
+- Berechnung der Geschwindigkeit
+- Berechnung der Beschleunigung
+- Berechnung der Steigung
+- Berechnung des Motordrehmoments
+- Berechnung der Motorleistung
+- Simulation eines LiPo-Akkus
+- Simulation eines NMC-Akkus
+- Vergleich beider Akkutypen
+- Berechnung des Ladezustands (SoC)
 - Berechnung der Akkuspannung
-- Grafische Darstellung der Simulation
-- Ausgabe eines Berichts im Terminal
+- Berechnung der Hauptfahrtrichtung aus GPS-Daten
+- Erstellung einer interaktiven Folium-Karte
+- Farbige Darstellung der Geschwindigkeit entlang der Route
+- Automatische Parameterstudie
+- Erstellung verschiedener Diagramme
+- Zusammenfassender Bericht im Terminal
 
 ---
 
@@ -47,10 +55,21 @@ Nach jeder Simulation werden folgende Kennwerte ausgegeben:
 ## Projektstruktur
 
 ```
-Abschlussprojekt_Danijel_Stana/
+Abschlussprojekt_Danijel_Stana-/
 
 ├── data/
 │   └── final_project_input_data.csv
+│
+├── output/
+│   ├── 1_höhenprofil.png
+│   ├── 2_geschwindigkeit.png
+│   ├── 3_leistung.png
+│   ├── 4_soc.png
+│   ├── 5_spannung.png
+│   ├── 6_route_map.png.png
+│   ├── 7_parameterstudie_masse.png
+│   ├── 8_parameterstudie_reifen.png
+│   └── parameterstudie.txt
 │
 ├── src/
 │   └── main.py
@@ -176,7 +195,27 @@ Zusätzlich zu den Minimalanforderungen wurden folgende Erweiterungen umgesetzt:
 
 ---
 
-## Autoren
+### parameterstudie.txt
 
-- Danijel PALADIN (DanijelRS)
-- Stana NARIC (StanaNa00)
+Enthält sämtliche Ergebnisse der Parameterstudie in Textform.
+
+Ausgegeben werden:
+
+- Einfluss der Fahrermasse
+- Einfluss des Reifendurchmessers
+- Motorunterstützte Strecke
+- Maximale Leistung
+
+### 7_parameterstudie_masse.png
+
+Diagramm über den Einfluss der Fahrermasse auf die Strecke mit Motorunterstützung.
+
+Es zeigt deutlich, dass mit steigender Fahrermasse die motorunterstützte Strecke abnimmt.
+
+### 8_parameterstudie_reifen.png
+
+Diagramm über den Einfluss des Reifendurchmessers auf die Strecke mit Motorunterstützung.
+
+Dadurch können unterschiedliche Reifendurchmesser miteinander verglichen werden.
+
+Alle Dateien werden bei jedem Programmstart automatisch neu erzeugt.
