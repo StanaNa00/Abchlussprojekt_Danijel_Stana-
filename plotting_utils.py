@@ -263,7 +263,7 @@ def plot_simulations_ergebnisse(berechnete_daten, daten_lipo, daten_nmc, hauptor
     fig5.savefig(os.path.join(output_ordner, '5_spannung.png'), dpi=300)
 
 
-    plt.show(block=True)
+    plt.close("all")
     return [fig1, fig2, fig3, fig4, fig5]
 
 
