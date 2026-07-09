@@ -102,7 +102,7 @@ git clone https://github.com/StanaNa00/Abchlussprojekt_Danijel_Stana-.git
 Projektordner öffnen
 
 ```bash
-cd Abschlussprojekt_Danijel_Stana-
+cd Abchlussprojekt_Danijel_Stana-
 ```
 
 Benötigte Pakete installieren
