@@ -27,12 +27,19 @@ def simuliere_akku_fahrt(datenframe, akku_objekt):
     soc_liste = []
     spannung_liste = []
     strom_liste = []
+
+    warnung_ausgegeben = False
+
+    
     
     for index, zeile in df_sim.iterrows():
         if akku_objekt.is_empty():
+            if not warnung_ausgegeben:
+                print("WARNUNG: Akku leer - Motorunterstützung wird deaktiviert.")
+                warnung_ausgegeben = True
             strom = 0.0
         else:
-            strom = zeile['I_motor']
+            strom = zeile["I_motor"]
             
         dauer = zeile['delta_t']
         
@@ -41,6 +48,10 @@ def simuliere_akku_fahrt(datenframe, akku_objekt):
         soc_liste.append(akku_objekt.soc)
         spannung_liste.append(akku_objekt.voltage(current=strom))
         strom_liste.append(strom)
+
+        
+
+        
         
     df_sim['akku_soc'] = soc_liste
     df_sim['akku_spannung'] = spannung_liste
