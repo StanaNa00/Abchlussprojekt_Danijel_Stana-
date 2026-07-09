@@ -178,7 +178,7 @@ def main():
     print(berechnete_daten[['time', 'v', 'a', 'F_ges', 'I_motor']].head(10))
 
 
-    kapacitet_test = 40.0
+    kapacitet_test = 20.0
 
     logging.info(f"Starte E-Bike-Batteriesimulation mit LiPo-Akku ({kapacitet_test}Ah, 100% Start-SoC)")
     lipo_batterie = LiPoAkku(capacity_nom_Ah=kapacitet_test, initial_soc=1.0)
