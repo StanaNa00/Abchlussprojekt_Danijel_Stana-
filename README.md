@@ -219,3 +219,15 @@ Diagramm über den Einfluss des Reifendurchmessers auf die Strecke mit Motorunte
 Dadurch können unterschiedliche Reifendurchmesser miteinander verglichen werden.
 
 Alle Dateien werden bei jedem Programmstart automatisch neu erzeugt.
+
+## General info
+Die Git-Logs zeigen eine große Anzahl an Hinzufügungen und Löschungen; dies geschieht, weil bei jedem Programmdurchlauf und dem anschließenden Push zu Git die Warnung „warning: in the working copy of 'route_map.html', LF will be replaced by CRLF the next time Git touches it“ erscheint. Dadurch werden ~4.000 Zeilen zur Datei hinzugefügt und ebenso viele entfernt, was zu der hohen Anzahl führt.
+
+### KI
+Künstliche Intelligenz wurde in diesem Projekt ausschließlich eingesetzt, um Fehler zu beheben, die wir selbst nicht lösen konnten, sowie für „folium“, da uns dieses völlig unbekannt war.
+
+## Quellen
+-https://geopandas.org/en/stable/gallery/plotting_with_folium.html
+-https://matplotlib.org/
+-https://thatmaceguy.github.io/python/gps-data-analysis-intro/
+-https://medium.com/data-science/visualizing-routes-on-interactive-maps-with-python-part-1-44f8d25d0761
